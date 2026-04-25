@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Link2, Clock } from "lucide-react";
 
 export const AccessControl = () => {
   const [doctorAccess, setDoctorAccess] = useState(true);
@@ -15,63 +14,25 @@ export const AccessControl = () => {
   };
 
   return (
-    <div className="min-h-screen bg-honey-50 p-10">
-      <motion.h1
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-3xl font-bold text-gray-800 mb-10"
-      >
-        Access Control
-      </motion.h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">Access Control</h1>
+        <p className="text-gray-400 text-sm">Manage who can view your medical records</p>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="card space-y-5">
+            <Toggle label="Doctor Access" value={doctorAccess} onChange={() => setDoctorAccess(!doctorAccess)} />
+            <Toggle label="Emergency Access" value={emergencyAccess} onChange={() => setEmergencyAccess(!emergencyAccess)} />
+            <Toggle label="Hospital Access" value={hospitalAccess} onChange={() => setHospitalAccess(!hospitalAccess)} />
 
-        {/* MAIN SECTION */}
-        <div className="lg:col-span-2 space-y-6">
-
-          {/* Profile Card */}
-          <div className="card">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              Patient Profile
-            </h2>
-            <p className="text-gray-600">
-              Manage who can access your medical records.
-            </p>
-          </div>
-
-          {/* Toggles */}
-          <div className="card space-y-6">
-
-            {/* Doctor */}
-            <Toggle
-              label="Doctor Access"
-              value={doctorAccess}
-              onChange={() => setDoctorAccess(!doctorAccess)}
-            />
-
-            {/* Emergency */}
-            <Toggle
-              label="Emergency Access"
-              value={emergencyAccess}
-              onChange={() => setEmergencyAccess(!emergencyAccess)}
-            />
-
-            {/* Hospital */}
-            <Toggle
-              label="Hospital Access"
-              value={hospitalAccess}
-              onChange={() => setHospitalAccess(!hospitalAccess)}
-            />
-
-            {/* Token Expiry */}
             <div>
-              <label className="text-gray-700 font-medium">
-                Token Expiry
-              </label>
+              <label className="block text-sm font-medium text-gray-600 mb-1.5">Link Expiry</label>
               <select
                 value={tokenExpiry}
                 onChange={(e) => setTokenExpiry(e.target.value)}
-                className="mt-2 w-full p-3 rounded-lg border border-gray-200"
+                className="w-full p-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
               >
                 <option value="1h">1 Hour</option>
                 <option value="24h">24 Hours</option>
@@ -79,70 +40,48 @@ export const AccessControl = () => {
               </select>
             </div>
 
-            {/* Generate Link */}
-            <button
-              onClick={handleGenerateLink}
-              className="w-full py-3 rounded-lg bg-honey-500 text-white font-bold hover:bg-honey-600 transition"
-            >
+            <button onClick={handleGenerateLink} className="btn-honey w-full py-3">
               Generate Secure Link
             </button>
 
             {generatedLink && (
-              <div className="bg-honey-100 p-4 rounded-lg text-honey-700 break-all">
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-700 text-sm font-mono break-all">
                 {generatedLink}
               </div>
             )}
           </div>
         </div>
 
-        {/* RIGHT SIDE PANEL */}
-        <div className="space-y-6">
-
-          {/* AI Consent Suggestion */}
-          <div className="card">
-            <h3 className="font-bold text-gray-800 mb-3">
-              AI Consent Suggestion
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Based on your profile, enabling Emergency Access is recommended
-              for faster treatment during critical situations.
+        <div className="space-y-4">
+          <div className="bg-amber-50 border border-amber-200 p-5 rounded-xl">
+            <h3 className="font-semibold text-amber-700 mb-2 text-sm">AI Suggestion</h3>
+            <p className="text-amber-600 text-sm">
+              Enabling Emergency Access is recommended for faster treatment during critical situations.
             </p>
           </div>
 
-          {/* AI Summary Preview */}
           <div className="card">
-            <h3 className="font-bold text-gray-800 mb-3">
-              Shared Summary Preview
-            </h3>
-            <p className="text-gray-600 text-sm">
-              Only allergies, chronic conditions, and medications will be shared.
+            <h3 className="font-semibold text-gray-800 mb-2 text-sm">What Gets Shared</h3>
+            <p className="text-gray-500 text-sm">
+              Only allergies, chronic conditions, and current medications are shared via secure links.
             </p>
           </div>
-
         </div>
-
       </div>
     </div>
   );
 };
 
-/* Toggle Component */
-const Toggle = ({ label, value, onChange }) => {
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-gray-700 font-medium">{label}</span>
-      <button
-        onClick={onChange}
-        className={`w-12 h-6 flex items-center rounded-full p-1 transition ${
-          value ? "bg-honey-500" : "bg-gray-300"
-        }`}
-      >
-        <div
-          className={`bg-white w-4 h-4 rounded-full shadow-md transform transition ${
-            value ? "translate-x-6" : ""
-          }`}
-        />
-      </button>
-    </div>
-  );
-};
+const Toggle = ({ label, value, onChange }) => (
+  <div className="flex items-center justify-between">
+    <span className="text-sm font-medium text-gray-700">{label}</span>
+    <button
+      onClick={onChange}
+      className={`w-11 h-6 flex items-center rounded-full p-0.5 transition-colors ${
+        value ? "bg-amber-400" : "bg-gray-200"
+      }`}
+    >
+      <div className={`bg-white w-5 h-5 rounded-full shadow transform transition-transform ${value ? "translate-x-5" : ""}`} />
+    </button>
+  </div>
+);

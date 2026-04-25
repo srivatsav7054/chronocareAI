@@ -1,34 +1,39 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { Home, Clock, Upload, AlertCircle, FileText, Brain, Shield, User } from "lucide-react";
 
 export const LeftSidebar = () => {
   const location = useLocation();
 
   const navItems = [
-    { label: "Patient Profile", path: "/profile" },
-    { label: "Upload Report", path: "/upload" },
-    { label: "Health Score", path: "/health-score" },
-    { label: "Risk Analysis", path: "/risk-analysis" },
-    { label: "Access Control", path: "/access-control" },
-    { label: "Emergency Mode", path: "/emergency" },
+    { label: "Dashboard", path: "/dashboard", icon: Home },
+    { label: "My Profile", path: "/unified-profile", icon: User },
+    { label: "Health Timeline", path: "/timeline", icon: Clock },
+    { label: "Medical Story", path: "/medical-story", icon: FileText },
+    { label: "Upload Report", path: "/upload", icon: Upload },
+    { label: "Health Score", path: "/health-intelligence", icon: Brain },
+    { label: "Access Control", path: "/access-control", icon: Shield },
+    { label: "Emergency", path: "/emergency", icon: AlertCircle },
   ];
 
   return (
-    <div className="w-64 bg-white border-r border-gray-200 p-6">
-      <div className="space-y-3">
+    <div className="w-60 bg-white border-r border-gray-200 p-4 shrink-0 min-h-[calc(100vh-64px)] overflow-y-auto">
+      <div className="space-y-1">
         {navItems.map((item) => {
+          const IconComponent = item.icon;
           const isActive = location.pathname === item.path;
 
           return (
-            <Link key={item.path} to={item.path}>
+            <Link key={item.path} to={item.path} className="block">
               <div
-                className={`px-4 py-3 rounded-lg font-medium transition ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-blue-100 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-amber-100 text-amber-700"
+                    : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"
                 }`}
               >
-                {item.label}
+                {IconComponent && <IconComponent className="w-[18px] h-[18px]" />}
+                <span>{item.label}</span>
               </div>
             </Link>
           );

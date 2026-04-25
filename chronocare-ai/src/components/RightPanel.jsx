@@ -2,34 +2,24 @@ import React from "react";
 
 export const RightPanel = () => {
   return (
-    <div className="space-y-6">
-      
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-        <h3 className="font-bold text-blue-700 mb-2">
-          Health Intelligence Score
-        </h3>
-        <p className="text-3xl font-bold text-blue-600">85</p>
+    <div className="space-y-4">
+      <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+        <h3 className="text-xs font-semibold text-amber-600 mb-1">Health Score</h3>
+        <p className="text-2xl font-bold text-gray-800">85</p>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-        <h3 className="font-bold text-yellow-700 mb-2">
-          Risk Level
-        </h3>
-        <p className="text-lg font-semibold text-yellow-600">
-          Moderate
-        </p>
+      <div className="bg-orange-50 border border-orange-200 rounded-xl p-5">
+        <h3 className="text-xs font-semibold text-orange-600 mb-1">Risk Level</h3>
+        <p className="text-base font-semibold text-gray-700">Moderate</p>
       </div>
 
-      <div className="bg-gray-100 border border-gray-200 rounded-xl p-6">
-        <h3 className="font-bold text-gray-700 mb-2">
-          Quick Stats
-        </h3>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+        <h3 className="text-xs font-semibold text-blue-600 mb-1">Upcoming</h3>
         <p className="text-gray-600 text-sm">
-          Appointments: 5 <br />
-          Last Visit: 01/01/2024
+          Appointments: 5<br />
+          Last Check: Jan 1, 2024
         </p>
       </div>
-
     </div>
   );
 };
