@@ -2,31 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Base ─── */
 body {
-  @apply bg-white text-gray-800 font-sans;
+  @apply bg-gray-50 text-gray-800 font-sans antialiased;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
-/* Smooth transitions globally */
-* {
-  @apply transition-all duration-200 ease-in-out;
-}
-
-/* Soft card style */
+/* ─── Clean card ─── */
 .card {
-  @apply bg-white rounded-xl shadow-md border border-gray-100 p-6;
+  @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
 }
 
-/* Primary honey button */
+.card:hover {
+  @apply shadow-md;
+}
+
+/* ─── Primary button — warm amber/yellow ─── */
 .btn-honey {
-  @apply bg-honey-500 hover:bg-honey-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md;
+  @apply bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold px-6 py-3 rounded-xl shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-all text-sm;
 }
 
-/* Secondary outline button */
+/* ─── Outline button ─── */
 .btn-outline {
-  @apply border border-honey-500 text-honey-600 hover:bg-honey-50 px-6 py-3 rounded-lg;
+  @apply border-2 border-amber-400 text-amber-600 hover:bg-amber-400 hover:text-gray-900 px-6 py-3 rounded-xl font-semibold transition-all text-sm;
 }
 
-/* Subtle section background */
+/* ─── Subtle highlight ─── */
 .section-soft {
-  @apply bg-honey-50;
+  @apply bg-amber-50/50 border border-amber-100 rounded-2xl;
 }

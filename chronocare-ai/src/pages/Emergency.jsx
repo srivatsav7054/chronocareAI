@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Pill, AlertCircle, Droplet, X } from 'lucide-react';
-import { Navbar } from '../components/Navbar';
 import { dummyUserData } from '../data/dummyData';
 
 export const Emergency = () => {
@@ -15,126 +14,81 @@ export const Emergency = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
         >
           <motion.div
-            initial={{ scale: 0.9, y: 40 }}
+            initial={{ scale: 0.95, y: 20 }}
             animate={{ scale: 1, y: 0 }}
-            exit={{ scale: 0.9, y: 40 }}
-            className="relative w-full max-w-3xl bg-red-600 rounded-2xl p-8 shadow-2xl"
+            className="relative w-full max-w-2xl bg-white rounded-2xl p-8 shadow-2xl border-2 border-red-200"
           >
-            {/* Close */}
-            <button
-              onClick={() => setIsActivated(false)}
-              className="absolute top-6 right-6 text-white hover:opacity-80"
-            >
-              <X className="w-6 h-6" />
+            <button onClick={() => setIsActivated(false)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500">
+              <X className="w-5 h-5" />
             </button>
 
-            {/* Header */}
-            <div className="text-center mb-10">
-              <motion.div
-                animate={{ rotate: [0, 8, -8, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-                className="flex justify-center mb-4"
-              >
-                <AlertTriangle
-                  className="w-16 h-16 text-white"
-                  fill="currentColor"
-                />
-              </motion.div>
-
-              <h1 className="text-4xl font-black text-white mb-2">
-                EMERGENCY MODE
-              </h1>
-              <p className="text-red-100 text-lg">
-                Critical Health Information for {dummyUserData.name}
-              </p>
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <AlertTriangle className="w-7 h-7 text-red-500" />
+              </div>
+              <h1 className="text-2xl font-bold text-red-600">Emergency Information</h1>
+              <p className="text-gray-400 text-sm mt-1">Critical health data for {dummyUserData.name}</p>
             </div>
 
-            {/* Info Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-              {/* Blood Group */}
-              <div className="bg-white/20 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <Droplet className="w-6 h-6 text-white" />
-                  <h2 className="text-white font-bold text-lg">Blood Group</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-red-50 border border-red-100 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Droplet className="w-4 h-4 text-red-500" />
+                  <h2 className="text-sm font-semibold text-gray-700">Blood Group</h2>
                 </div>
-                <p className="text-4xl font-black text-white">
-                  {dummyUserData.bloodGroup}
-                </p>
+                <p className="text-3xl font-bold text-red-600">{dummyUserData.bloodGroup}</p>
               </div>
 
-              {/* Allergies */}
-              <div className="bg-white/20 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <AlertCircle className="w-6 h-6 text-yellow-300" />
-                  <h2 className="text-white font-bold text-lg">Allergies</h2>
+              <div className="bg-amber-50 border border-amber-100 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  <h2 className="text-sm font-semibold text-gray-700">Allergies</h2>
                 </div>
-                <div className="space-y-2">
-                  {dummyUserData.allergies.map((allergy, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-red-500/70 text-white px-3 py-2 rounded-lg font-semibold"
-                    >
-                      ⚠ {allergy}
-                    </div>
+                <div className="space-y-1">
+                  {dummyUserData.allergies.map((a, i) => (
+                    <span key={i} className="inline-block bg-amber-200/60 text-amber-800 px-2 py-1 rounded-md text-xs font-medium mr-1">
+                      {a}
+                    </span>
                   ))}
                 </div>
               </div>
 
-              {/* Chronic Conditions */}
-              <div className="bg-white/20 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <AlertCircle className="w-6 h-6 text-orange-300" />
-                  <h2 className="text-white font-bold text-lg">
-                    Chronic Conditions
-                  </h2>
+              <div className="bg-orange-50 border border-orange-100 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle className="w-4 h-4 text-orange-500" />
+                  <h2 className="text-sm font-semibold text-gray-700">Chronic Conditions</h2>
                 </div>
-                <div className="space-y-2">
-                  {dummyUserData.chronicConditions.map((condition, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-orange-500/70 text-white px-3 py-2 rounded-lg font-semibold"
-                    >
-                      • {condition}
-                    </div>
+                <div className="space-y-1">
+                  {dummyUserData.chronicConditions.map((c, i) => (
+                    <p key={i} className="text-sm text-gray-600">• {c}</p>
                   ))}
                 </div>
               </div>
 
-              {/* Medications */}
-              <div className="bg-white/20 rounded-xl p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <Pill className="w-6 h-6 text-blue-200" />
-                  <h2 className="text-white font-bold text-lg">
-                    Current Medications
-                  </h2>
+              <div className="bg-blue-50 border border-blue-100 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Pill className="w-4 h-4 text-blue-500" />
+                  <h2 className="text-sm font-semibold text-gray-700">Medications</h2>
                 </div>
-                <div className="space-y-2">
-                  {dummyUserData.currentMedications.map((med, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-blue-500/70 text-white px-3 py-2 rounded-lg"
-                    >
-                      <p className="font-bold">{med.name}</p>
-                      <p className="text-sm">
-                        {med.dosage} — {med.frequency}
-                      </p>
+                <div className="space-y-1.5">
+                  {dummyUserData.currentMedications.map((m, i) => (
+                    <div key={i}>
+                      <p className="font-medium text-sm text-gray-700">{m.name}</p>
+                      <p className="text-xs text-gray-400">{m.dosage} — {m.frequency}</p>
                     </div>
                   ))}
                 </div>
               </div>
-
             </div>
 
-            {/* Close Button */}
             <button
               onClick={() => setIsActivated(false)}
-              className="mt-8 w-full py-3 bg-white text-red-600 font-bold rounded-lg hover:bg-gray-100 transition"
+              className="mt-6 w-full py-3 border-2 border-red-200 text-red-500 font-semibold rounded-xl hover:bg-red-50 transition text-sm"
             >
-              Exit Emergency Mode
+              Close Emergency View
             </button>
           </motion.div>
         </motion.div>
@@ -143,54 +97,35 @@ export const Emergency = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
+    <div className="max-w-lg mx-auto text-center space-y-8">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-1">Emergency Mode</h1>
+        <p className="text-gray-400 text-sm">Instantly access critical health info in an emergency</p>
+      </div>
 
-      <main className="ml-64 p-10">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            Emergency Mode
-          </h1>
-          <p className="text-gray-500">
-            Quick access to critical health information in case of emergency
-          </p>
-        </div>
+      <div className="card py-12">
+        <p className="text-gray-500 text-sm mb-8">
+          Tap the button below to display your vital medical information — blood type, allergies, medications, and conditions.
+        </p>
 
-        {/* Emergency Button Section */}
-        <div className="max-w-xl">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-10 text-center">
-            <p className="text-gray-600 mb-8">
-              Click the button below to activate emergency access mode.
-              This displays vital medical information instantly.
-            </p>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsActivated(true)}
-              className="relative w-40 h-40 mx-auto"
-            >
-              <motion.div
-                animate={{ scale: [1, 1.15, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 rounded-full bg-red-200"
-              />
-
-              <div className="absolute inset-0 rounded-full bg-red-600 flex items-center justify-center shadow-xl">
-                <AlertTriangle
-                  className="w-16 h-16 text-white"
-                  fill="currentColor"
-                />
-              </div>
-            </motion.button>
-
-            <p className="mt-6 text-xl font-bold text-red-600">
-              ACTIVATE EMERGENCY
-            </p>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setIsActivated(true)}
+          className="relative w-32 h-32 mx-auto block"
+        >
+          <motion.div
+            animate={{ scale: [1, 1.15, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute inset-0 rounded-full bg-red-100"
+          />
+          <div className="absolute inset-0 rounded-full bg-red-500 flex items-center justify-center shadow-lg">
+            <AlertTriangle className="w-12 h-12 text-white" fill="currentColor" />
           </div>
-        </div>
-      </main>
+        </motion.button>
+
+        <p className="mt-6 text-sm font-semibold text-red-500">Activate Emergency</p>
+      </div>
     </div>
   );
 };

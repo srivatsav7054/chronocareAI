@@ -17,34 +17,34 @@ export const Dashboard = () => {
   return (
     <div className="space-y-8">
 
-      {/* AI Alert Banner */}
+      {/* Welcome Banner */}
       <motion.div
-        initial={{ opacity: 0, y: -15 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 flex items-start gap-4"
+        className="bg-gradient-to-r from-amber-400 to-yellow-300 rounded-2xl p-6 flex items-start gap-4"
       >
-        <AlertTriangle className="text-yellow-600 w-6 h-6 mt-1" />
+        <AlertTriangle className="text-amber-800 w-6 h-6 mt-0.5" />
         <div>
-          <h3 className="font-bold text-yellow-700">
+          <h3 className="font-semibold text-amber-900 text-sm">
             AI Alert: Mild Cardiovascular Risk Detected
           </h3>
-          <p className="text-yellow-600 text-sm">
+          <p className="text-amber-800/80 text-sm mt-1">
             Based on recent cholesterol trends, we recommend reviewing lifestyle adjustments.
           </p>
         </div>
       </motion.div>
 
       {/* Main Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Timeline Preview */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+          className="card"
         >
-          <h3 className="text-lg font-bold text-gray-800 mb-6">
-            Lifeline Timeline
+          <h3 className="text-base font-semibold text-gray-800 mb-5">
+            Recent Timeline
           </h3>
 
           <div className="space-y-4">
@@ -53,12 +53,12 @@ export const Dashboard = () => {
                 key={event.id}
                 className="flex items-start gap-3"
               >
-                <div className="w-3 h-3 rounded-full bg-blue-600 mt-2" />
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
                 <div>
-                  <p className="font-semibold text-gray-800 text-sm">
+                  <p className="font-medium text-gray-700 text-sm">
                     {event.title}
                   </p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-gray-400 text-xs">
                     {new Date(event.date).toLocaleDateString()}
                   </p>
                 </div>
@@ -71,24 +71,32 @@ export const Dashboard = () => {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+          className="card"
         >
-          <h3 className="text-lg font-bold text-gray-800 mb-6">
-            Health Trend Analysis
+          <h3 className="text-base font-semibold text-gray-800 mb-5">
+            Health Trend
           </h3>
 
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={dummyHealthTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="month" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+              <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
+              <YAxis stroke="#9ca3af" fontSize={12} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  borderRadius: "12px",
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)",
+                }}
+              />
               <Line
                 type="monotone"
                 dataKey="healthScore"
-                stroke="#2563eb"
-                strokeWidth={3}
-                dot={{ fill: "#2563eb", r: 4 }}
+                stroke="#f59e0b"
+                strokeWidth={2.5}
+                dot={{ fill: "#f59e0b", r: 4, strokeWidth: 2, stroke: "#fff" }}
+                activeDot={{ r: 6, strokeWidth: 0, fill: "#f59e0b" }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -96,40 +104,40 @@ export const Dashboard = () => {
       </div>
 
       {/* Quick Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <Activity className="text-blue-600 w-5 h-5" />
-            <h4 className="font-semibold text-gray-800">
-              Health Score
-            </h4>
+        <div className="card">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center">
+              <Activity className="text-amber-500 w-4 h-4" />
+            </div>
+            <h4 className="text-sm font-medium text-gray-500">Health Score</h4>
           </div>
-          <p className="text-3xl font-bold text-blue-600">
+          <p className="text-2xl font-bold text-gray-800">
             {dummyUserData.healthScore}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <TrendingUp className="text-green-600 w-5 h-5" />
-            <h4 className="font-semibold text-gray-800">
-              Risk Level
-            </h4>
+        <div className="card">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
+              <TrendingUp className="text-emerald-500 w-4 h-4" />
+            </div>
+            <h4 className="text-sm font-medium text-gray-500">Risk Level</h4>
           </div>
-          <p className="text-lg font-bold text-green-600">
+          <p className="text-lg font-semibold text-emerald-600">
             Moderate
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center gap-3 mb-3">
-            <AlertTriangle className="text-red-600 w-5 h-5" />
-            <h4 className="font-semibold text-gray-800">
-              Active Alerts
-            </h4>
+        <div className="card">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center">
+              <AlertTriangle className="text-red-500 w-4 h-4" />
+            </div>
+            <h4 className="text-sm font-medium text-gray-500">Active Alerts</h4>
           </div>
-          <p className="text-lg font-bold text-red-600">
+          <p className="text-lg font-semibold text-red-500">
             1 Critical
           </p>
         </div>
