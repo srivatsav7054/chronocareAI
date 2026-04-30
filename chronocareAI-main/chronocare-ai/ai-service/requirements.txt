@@ -1,0 +1,22 @@
+# ChronoCare AI - Medical Analysis Service
+# Fully Local Version (No External APIs)
+
+# FastAPI and Server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==1.10.13
+
+# Medical AI Models
+transformers==4.33.3
+torch==2.10.0
+
+# Ollama Integration (Local Model Inference)
+ollama==0.1.9
+
+# Utilities
+python-dotenv==1.0.0
+requests==2.31.0
+
+# Optional but recommended for production
+python-multipart==0.0.6
+aiofiles==23.2.1
