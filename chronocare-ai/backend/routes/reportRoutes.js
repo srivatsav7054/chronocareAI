@@ -1,9 +1,15 @@
 import express from "express";
-import { uploadReport } from "../controllers/reportController.js";
+import { uploadReport, getReports, getAllRoutedReports, reviewReport } from "../controllers/reportController.js";
+import { upload } from "../middleware/upload.js";
+import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Upload and route report
-router.post("/upload", uploadReport);
+router.get("/", protect, getReports);
+router.post("/upload", protect, upload.single("file"), uploadReport);
+
+// Doctor Routes
+router.get("/routed", protect, getAllRoutedReports);
+router.put("/:id/review", protect, reviewReport);
 
 export default router;

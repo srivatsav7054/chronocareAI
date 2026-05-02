@@ -5,15 +5,12 @@ import { useAuth } from "../context/AuthContext";
 import beeLogo from "../assets/bee-logo.svg";
 
 export const TopNav = () => {
-  const { logout } = useAuth();
+  const { logout, userProfile, role, toggleRole } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    if (logout) {
-      logout();
-    } else {
-      navigate("/login");
-    }
+    logout();
+    navigate("/login");
   };
 
   return (
@@ -26,13 +23,40 @@ export const TopNav = () => {
       </Link>
 
       <div className="flex gap-2 items-center">
+        {/* Toggle Role Button */}
+        <button
+          onClick={toggleRole}
+          className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+            role === "doctor" 
+              ? "bg-indigo-100 text-indigo-700 border-indigo-200" 
+              : "bg-emerald-100 text-emerald-700 border-emerald-200"
+          }`}
+        >
+          {role === "doctor" ? "👨‍⚕️ DOCTOR VIEW" : "🧑‍🦱 PATIENT VIEW"}
+        </button>
+        {/* Show user name if available */}
+        {userProfile?.name && (
+          <span className="hidden md:block text-sm text-gray-500 mr-1">
+            Hi, <span className="font-medium text-gray-700">{userProfile.name.split(" ")[0]}</span>
+          </span>
+        )}
+
         <Link
           to="/unified-profile"
           className="flex items-center gap-2 text-gray-500 hover:text-amber-500 hover:bg-amber-50 transition px-3 py-2 rounded-lg text-sm font-medium"
         >
-          <User className="w-4 h-4" />
+          {userProfile?.profilePicture ? (
+            <img
+              src={userProfile.profilePicture}
+              alt="avatar"
+              className="w-6 h-6 rounded-full object-cover"
+            />
+          ) : (
+            <User className="w-4 h-4" />
+          )}
           <span className="hidden sm:inline">Profile</span>
         </Link>
+
         <button
           onClick={handleLogout}
           className="flex items-center gap-2 text-gray-400 hover:text-red-500 hover:bg-red-50 transition px-3 py-2 rounded-lg text-sm font-medium"

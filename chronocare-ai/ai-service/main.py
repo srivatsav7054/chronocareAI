@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import json
 
-from medical_ai import classify_department, classify_risk, analyze_with_biomistral
+from medical_ai import classify_department, classify_risk, analyze_with_biomistral, predict_health_score, generate_medical_story
 
 # ============================================================================
 # LOGGING CONFIGURATION
@@ -81,6 +81,28 @@ class ErrorResponse(BaseModel):
     """Error response model"""
     error: str = Field(description="Error type")
     detail: str = Field(description="Error detail")
+
+class HealthScorePredictionRequest(BaseModel):
+    current_score: int
+    age: int
+    conditions: List[str]
+    recent_reports: List[Dict[str, str]]
+    recent_events: List[Dict[str, str]]
+
+class HealthScorePredictionResponse(BaseModel):
+    predicted_score_3_months: int
+    risk_trajectory: str
+    clinical_forecast: str
+    preventative_actions: List[str]
+
+class MedicalStoryRequest(BaseModel):
+    conditions: List[str]
+    timeline: List[Dict[str, str]]
+    reports: List[Dict[str, str]]
+
+class MedicalStoryResponse(BaseModel):
+    story: str
+    key_takeaway: str
 
 
 # ============================================================================
@@ -157,7 +179,7 @@ async def health_check() -> Dict[str, str]:
 # ============================================================================
 
 @app.post("/analyze", response_model=MedicalAnalysisResponse)
-async def analyze_medical_report(request: MedicalReportRequest) -> Dict[str, Any]:
+def analyze_medical_report(request: MedicalReportRequest) -> Dict[str, Any]:
     """
     Analyze medical report using BioLinkBERT + BioMistral pipeline.
     
@@ -268,6 +290,41 @@ async def analyze_medical_report(request: MedicalReportRequest) -> Dict[str, Any
             detail=f"Medical analysis failed: {str(e)}"
         )
 
+# ============================================================================
+# HEALTH SCORE PREDICTION ENDPOINT
+# ============================================================================
+
+@app.post("/predict-score", response_model=HealthScorePredictionResponse)
+def predict_score_endpoint(request: HealthScorePredictionRequest) -> Dict[str, Any]:
+    try:
+        result = predict_health_score(
+            current_score=request.current_score,
+            age=request.age,
+            conditions=request.conditions,
+            recent_reports=request.recent_reports,
+            recent_events=request.recent_events
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error predicting score: {e}")
+        raise HTTPException(status_code=500, detail="Prediction failed")
+
+# ============================================================================
+# MEDICAL STORY ENDPOINT
+# ============================================================================
+
+@app.post("/generate-story", response_model=MedicalStoryResponse)
+def generate_story_endpoint(request: MedicalStoryRequest) -> Dict[str, Any]:
+    try:
+        result = generate_medical_story(
+            conditions=request.conditions,
+            timeline=request.timeline,
+            reports=request.reports
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error generating story: {e}")
+        raise HTTPException(status_code=500, detail="Story generation failed")
 
 # ============================================================================
 # ERROR HANDLERS

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft } from "lucide-react";
+import { ChevronRight, ChevronLeft, Loader, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import beeLogo from "../assets/bee-logo.svg";
 
@@ -10,8 +10,10 @@ const inputClass =
 
 export const Signup = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -31,19 +33,34 @@ export const Signup = () => {
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    login({
-      ...form,
-      allergies: form.allergies ? form.allergies.split(",").map((s) => s.trim()) : [],
-      chronicConditions: form.chronicConditions ? form.chronicConditions.split(",").map((s) => s.trim()) : [],
-      currentMedications: [],
-    });
-    navigate("/dashboard");
+    setError("");
+    setIsLoading(true);
+    try {
+      const payload = {
+        ...form,
+        allergies: form.allergies
+          ? form.allergies.split(",").map((s) => s.trim()).filter(Boolean)
+          : [],
+        chronicConditions: form.chronicConditions
+          ? form.chronicConditions.split(",").map((s) => s.trim()).filter(Boolean)
+          : [],
+        currentMedications: [],
+      };
+      await register(payload);
+      navigate("/dashboard");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || "Registration failed. Please try again.";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const next = () => setStep((s) => Math.min(s + 1, 3));
-  const prev = () => setStep((s) => Math.max(s - 1, 1));
+  const next = () => { setError(""); setStep((s) => Math.min(s + 1, 3)); };
+  const prev = () => { setError(""); setStep((s) => Math.max(s - 1, 1)); };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-yellow-50 flex items-center justify-center px-4 py-10">
@@ -75,6 +92,19 @@ export const Signup = () => {
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
           <form onSubmit={handleSignup}>
+
+            {/* Error banner */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 mb-4"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {error}
+              </motion.div>
+            )}
+
             <AnimatePresence mode="wait">
               {step === 1 && (
                 <motion.div
@@ -92,7 +122,7 @@ export const Signup = () => {
                     <input type="email" required value={form.email} onChange={set("email")} className={inputClass} placeholder="you@example.com" />
                   </Field>
                   <Field label="Password" required>
-                    <input type="password" required value={form.password} onChange={set("password")} className={inputClass} placeholder="••••••••" />
+                    <input type="password" required minLength={6} value={form.password} onChange={set("password")} className={inputClass} placeholder="Min. 6 characters" />
                   </Field>
                   <Field label="Phone Number">
                     <input type="tel" value={form.phone} onChange={set("phone")} className={inputClass} placeholder="+1 (555) 123-4567" />
@@ -115,15 +145,15 @@ export const Signup = () => {
                   <Field label="Gender">
                     <select value={form.gender} onChange={set("gender")} className={inputClass}>
                       <option value="">Select gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                      <option value="Prefer not to say">Prefer not to say</option>
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Other</option>
+                      <option>Prefer not to say</option>
                     </select>
                   </Field>
                   <div className="grid grid-cols-2 gap-3">
                     <Field label="Height">
-                      <input type="text" value={form.height} onChange={set("height")} className={inputClass} placeholder="5'6&quot;" />
+                      <input type="text" value={form.height} onChange={set("height")} className={inputClass} placeholder='5&apos;6"' />
                     </Field>
                     <Field label="Weight">
                       <input type="text" value={form.weight} onChange={set("weight")} className={inputClass} placeholder="145 lbs" />
@@ -165,7 +195,7 @@ export const Signup = () => {
               )}
             </AnimatePresence>
 
-            {/* Navigation Buttons */}
+            {/* Navigation */}
             <div className="flex gap-3 mt-6">
               {step > 1 && (
                 <button
@@ -189,9 +219,14 @@ export const Signup = () => {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                   type="submit"
-                  className="flex-1 py-3 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all text-sm"
+                  disabled={isLoading}
+                  className="flex-1 py-3 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
-                  Create Account
+                  {isLoading ? (
+                    <><Loader className="w-4 h-4 animate-spin" /> Creating account...</>
+                  ) : (
+                    "Create Account"
+                  )}
                 </motion.button>
               )}
             </div>

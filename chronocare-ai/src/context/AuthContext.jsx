@@ -1,53 +1,79 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../api/api";
 
 const AuthContext = createContext();
 
-const defaultProfile = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@email.com",
-  phone: "+1 (555) 234-5678",
-  dateOfBirth: "1990-05-14",
-  gender: "Female",
-  bloodGroup: "O+",
-  height: "5'6\"",
-  weight: "145 lbs",
-  address: "42 Maple Street, Austin, TX 78701",
-  emergencyContact: "James Johnson — +1 (555) 987-6543",
-  healthScore: 82,
-  allergies: ["Penicillin", "Peanuts", "Shellfish"],
-  chronicConditions: ["Hypertension", "Type 2 Diabetes"],
-  currentMedications: [
-    { name: "Lisinopril", dosage: "10mg", frequency: "Once daily" },
-    { name: "Metformin", dosage: "500mg", frequency: "Twice daily" },
-  ],
-  profilePicture: null,
-};
-
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userProfile, setUserProfile] = useState(defaultProfile);
+  const [userProfile, setUserProfile] = useState(null);
+  const [loading, setLoading] = useState(true); // true while checking stored token
 
-  const login = (profileData) => {
-    if (profileData) {
-      setUserProfile((prev) => ({ ...prev, ...profileData }));
+  // ─── On mount: restore session from localStorage ────────────────────────
+  useEffect(() => {
+    const token = localStorage.getItem("hh_token");
+    if (!token) {
+      setLoading(false);
+      return;
     }
+    // Validate token + fetch fresh profile
+    api.get("/api/users/profile")
+      .then(({ data }) => {
+        setUserProfile(data.user);
+        setIsAuthenticated(true);
+      })
+      .catch(() => {
+        // Token expired / invalid
+        localStorage.removeItem("hh_token");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // ─── Register ────────────────────────────────────────────────────────────
+  const register = async (formData) => {
+    const { data } = await api.post("/api/users/register", formData);
+    localStorage.setItem("hh_token", data.token);
+    setUserProfile(data.user);
     setIsAuthenticated(true);
+    return data;
   };
 
+  // ─── Login ───────────────────────────────────────────────────────────────
+  const login = async (email, password) => {
+    const { data } = await api.post("/api/users/login", { email, password });
+    localStorage.setItem("hh_token", data.token);
+    setUserProfile(data.user);
+    setIsAuthenticated(true);
+    return data;
+  };
+
+  // ─── Logout ──────────────────────────────────────────────────────────────
   const logout = () => {
+    localStorage.removeItem("hh_token");
+    setUserProfile(null);
     setIsAuthenticated(false);
   };
 
-  const updateProfile = (updates) => {
-    setUserProfile((prev) => ({ ...prev, ...updates }));
+  // ─── Update profile (local + API) ────────────────────────────────────────
+  const updateProfile = async (updates) => {
+    const { data } = await api.patch("/api/users/profile", updates);
+    setUserProfile(data.user);
+    return data;
   };
+
+  // ─── Role Toggle (Demo Purposes) ─────────────────────────────────────────
+  const [role, setRole] = useState("patient");
+  const toggleRole = () => setRole(r => r === "patient" ? "doctor" : "patient");
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
         userProfile,
+        loading,
+        role,
+        toggleRole,
         login,
+        register,
         logout,
         updateProfile,
       }}

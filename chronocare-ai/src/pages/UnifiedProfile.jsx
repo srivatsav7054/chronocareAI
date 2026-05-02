@@ -1,31 +1,44 @@
-import React, { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
   Camera, Mail, Phone, MapPin, Calendar, Heart, Droplet,
-  AlertCircle, Pill, Shield, Maximize2, Activity, Save, Edit2, X, User
+  AlertCircle, Pill, Shield, Maximize2, Activity, Save, Edit2, X, User,
+  CheckCircle, Loader
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-
-
-/* ─── Profile Page ─── */
 export const UnifiedProfile = () => {
   const { userProfile, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [saveMsg, setSaveMsg] = useState(null); // { type: 'success'|'error', text }
 
-  const startEdit = (e) => {
+  const startEdit = () => {
     setEditData({ ...userProfile });
     setIsEditing(true);
+    setSaveMsg(null);
   };
 
-  const cancelEdit = (e) => {
+  const cancelEdit = () => {
     setIsEditing(false);
+    setSaveMsg(null);
   };
 
-  const saveEdit = (e) => {
-    updateProfile(editData);
-    setIsEditing(false);
+  const saveEdit = async () => {
+    setSaving(true);
+    setSaveMsg(null);
+    try {
+      await updateProfile(editData);
+      setIsEditing(false);
+      setSaveMsg({ type: "success", text: "Profile saved successfully" });
+      setTimeout(() => setSaveMsg(null), 3000);
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Failed to save profile";
+      setSaveMsg({ type: "error", text: msg });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const set = (key) => (e) => setEditData({ ...editData, [key]: e.target.value });
@@ -34,21 +47,19 @@ export const UnifiedProfile = () => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        updateProfile({ profilePicture: reader.result });
-      };
+      reader.onloadend = () => updateProfile({ profilePicture: reader.result });
       reader.readAsDataURL(file);
     }
   };
 
-  const p = userProfile;
+  const p = userProfile || {};
   const inputClass =
     "w-full px-3 py-2 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent transition";
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
 
-      {/* Header + Edit Button */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
@@ -56,8 +67,7 @@ export const UnifiedProfile = () => {
         </div>
         {!isEditing ? (
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
             onClick={startEdit}
             className="flex items-center gap-2 px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl text-sm shadow-sm hover:shadow-md transition-all"
           >
@@ -65,29 +75,40 @@ export const UnifiedProfile = () => {
           </motion.button>
         ) : (
           <div className="flex gap-2">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={cancelEdit}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium rounded-xl text-sm transition"
-            >
+            <motion.button whileTap={{ scale: 0.95 }} onClick={cancelEdit}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 font-medium rounded-xl text-sm transition">
               <X className="w-4 h-4" /> Cancel
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={saveEdit}
-              className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl text-sm shadow-sm hover:shadow-md transition-all"
-            >
-              <Save className="w-4 h-4" /> Save Changes
+            <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={saveEdit} disabled={saving}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl text-sm shadow-sm hover:shadow-md transition-all disabled:opacity-70">
+              {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              {saving ? "Saving..." : "Save Changes"}
             </motion.button>
           </div>
         )}
       </div>
 
+      {/* Save feedback banner */}
+      {saveMsg && (
+        <motion.div
+          initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }}
+          className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm border ${
+            saveMsg.type === "success"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+              : "bg-red-50 border-red-200 text-red-600"
+          }`}
+        >
+          {saveMsg.type === "success"
+            ? <CheckCircle className="w-4 h-4" />
+            : <AlertCircle className="w-4 h-4" />}
+          {saveMsg.text}
+        </motion.div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* LEFT: Avatar + Quick Info */}
+        {/* LEFT */}
         <div className="space-y-4">
-          {/* Avatar Card */}
+          {/* Avatar */}
           <div className="card flex flex-col items-center py-8">
             <div className="relative group">
               <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-300 to-yellow-400 flex items-center justify-center overflow-hidden shadow-lg ring-4 ring-amber-100">
@@ -105,10 +126,9 @@ export const UnifiedProfile = () => {
             <h2 className="mt-4 text-lg font-bold text-gray-800">{p.name || "Your Name"}</h2>
             <p className="text-gray-400 text-sm">{p.email}</p>
 
-            {/* Quick Stats */}
             <div className="flex gap-4 mt-5 w-full px-4">
               <div className="flex-1 text-center bg-amber-50 rounded-xl py-3">
-                <p className="text-xl font-bold text-amber-600">{p.healthScore || "—"}</p>
+                <p className="text-xl font-bold text-amber-600">{p.healthScore ?? "—"}</p>
                 <p className="text-xs text-gray-400">Health Score</p>
               </div>
               <div className="flex-1 text-center bg-red-50 rounded-xl py-3">
@@ -127,7 +147,7 @@ export const UnifiedProfile = () => {
             {isEditing ? (
               <input
                 value={Array.isArray(editData.allergies) ? editData.allergies.join(", ") : editData.allergies || ""}
-                onChange={(e) => setEditData({ ...editData, allergies: e.target.value.split(",").map(s => s.trim()) })}
+                onChange={(e) => setEditData({ ...editData, allergies: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
                 className={inputClass}
                 placeholder="Penicillin, Peanuts"
               />
@@ -161,7 +181,7 @@ export const UnifiedProfile = () => {
           </div>
         </div>
 
-        {/* RIGHT: Details */}
+        {/* RIGHT */}
         <div className="lg:col-span-2 space-y-4">
           {/* Personal Info */}
           <div className="card">
@@ -199,7 +219,7 @@ export const UnifiedProfile = () => {
             {isEditing ? (
               <input
                 value={Array.isArray(editData.chronicConditions) ? editData.chronicConditions.join(", ") : editData.chronicConditions || ""}
-                onChange={(e) => setEditData({ ...editData, chronicConditions: e.target.value.split(",").map(s => s.trim()) })}
+                onChange={(e) => setEditData({ ...editData, chronicConditions: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) })}
                 className={inputClass}
                 placeholder="Hypertension, Diabetes"
               />
@@ -218,7 +238,6 @@ export const UnifiedProfile = () => {
   );
 };
 
-/* ─── Reusable Info Row ─── */
 const InfoRow = ({ icon, label, value, field, isEditing, editData, set, inputClass, type = "text" }) => (
   <div>
     <label className="flex items-center gap-1.5 text-xs text-gray-400 mb-1">

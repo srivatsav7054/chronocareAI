@@ -17,6 +17,8 @@ import { MedicalStory } from "./pages/MedicalStory";
 import { AccessControl } from "./pages/AccessControl";
 import { UnifiedProfile } from "./pages/UnifiedProfile";
 import { HealthIntelligence } from "./pages/HealthIntelligence";
+import { ReportTracking } from "./pages/ReportTracking";
+import { DoctorPortal } from "./pages/DoctorPortal";
 
 import "./index.css";
 
@@ -61,6 +63,14 @@ const AppRoutes = () => {
 
       <Route path="/health-intelligence" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
         <Route index element={<HealthIntelligence />} />
+      </Route>
+
+      <Route path="/report-tracking" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route index element={<ReportTracking />} />
+      </Route>
+
+      <Route path="/doctor-portal" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+        <Route index element={<DoctorPortal />} />
       </Route>
 
       <Route path="/emergency" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>

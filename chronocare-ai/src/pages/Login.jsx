@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Loader, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import beeLogo from "../assets/bee-logo.svg";
 
@@ -9,11 +10,23 @@ export const Login = () => {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    login();
-    navigate("/dashboard");
+    setError("");
+    setIsLoading(true);
+    try {
+      await login(email, password);
+      navigate("/dashboard");
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message || "Login failed. Please try again.";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,9 +40,7 @@ export const Login = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <img src={beeLogo} alt="HealthHive" className="w-14 h-14 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-800">
-            Welcome back
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-800">Welcome back</h1>
           <p className="text-gray-400 text-sm mt-1">
             Sign in to your HealthHive account
           </p>
@@ -38,6 +49,19 @@ export const Login = () => {
         {/* Form Card */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
           <form onSubmit={handleLogin} className="space-y-5">
+
+            {/* Error banner */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3"
+              >
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {error}
+              </motion.div>
+            )}
+
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1.5">
                 Email
@@ -70,9 +94,14 @@ export const Login = () => {
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
               type="submit"
-              className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all"
+              disabled={isLoading}
+              className="w-full py-3 bg-amber-400 hover:bg-amber-500 text-gray-900 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Sign In
+              {isLoading ? (
+                <><Loader className="w-4 h-4 animate-spin" /> Signing in...</>
+              ) : (
+                "Sign In"
+              )}
             </motion.button>
           </form>
         </div>

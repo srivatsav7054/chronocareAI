@@ -1,20 +1,29 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Home, Clock, Upload, AlertCircle, FileText, Brain, Shield, User } from "lucide-react";
+import { Home, Clock, Upload, AlertCircle, FileText, Brain, Shield, User, Stethoscope, FileSearch } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export const LeftSidebar = () => {
   const location = useLocation();
+  const { role } = useAuth();
 
-  const navItems = [
+  const patientNavItems = [
     { label: "Dashboard", path: "/dashboard", icon: Home },
     { label: "My Profile", path: "/unified-profile", icon: User },
     { label: "Health Timeline", path: "/timeline", icon: Clock },
     { label: "Medical Story", path: "/medical-story", icon: FileText },
     { label: "Upload Report", path: "/upload", icon: Upload },
+    { label: "Report Tracking", path: "/report-tracking", icon: FileSearch },
     { label: "Health Score", path: "/health-intelligence", icon: Brain },
     { label: "Access Control", path: "/access-control", icon: Shield },
     { label: "Emergency", path: "/emergency", icon: AlertCircle },
   ];
+
+  const doctorNavItems = [
+    { label: "Doctor Portal", path: "/doctor-portal", icon: Stethoscope },
+  ];
+
+  const navItems = role === "doctor" ? doctorNavItems : patientNavItems;
 
   return (
     <div className="w-60 bg-white border-r border-gray-200 p-4 shrink-0 min-h-[calc(100vh-64px)] overflow-y-auto">

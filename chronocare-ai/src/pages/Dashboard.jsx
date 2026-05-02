@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, TrendingUp, Activity } from "lucide-react";
+import { AlertTriangle, TrendingUp, Activity, Loader } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -10,10 +10,67 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-import { dummyUserData, dummyHealthTrendData, dummyTimelineEvents } from "../data/dummyData";
+import api from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
 export const Dashboard = () => {
+  const { userProfile } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [timeline, setTimeline] = useState([]);
+  const [healthData, setHealthData] = useState(null);
+  const [recentReports, setRecentReports] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [timelineRes, healthRes, reportsRes] = await Promise.all([
+          api.get("/api/timeline"),
+          api.get("/api/health-score"),
+          api.get("/api/reports")
+        ]);
+
+        setTimeline(timelineRes.data.events || []);
+        setHealthData(healthRes.data.healthScore || null);
+        setRecentReports(reportsRes.data.reports || []);
+      } catch (err) {
+        console.error("Failed to fetch dashboard data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3">
+        <Loader className="w-8 h-8 text-amber-400 animate-spin" />
+        <p className="text-gray-400 text-sm">Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  // Derive alert from recent reports
+  let alertSeverity = null;
+  let alertMessage = "No recent critical alerts. Your health looks stable.";
+  if (recentReports.length > 0) {
+    const latestSev = (recentReports[0].analysisResult?.severity || "").toLowerCase();
+    if (latestSev === "critical" || latestSev === "severe") {
+      alertSeverity = "high";
+      alertMessage = `High risk detected in recent report: ${recentReports[0].analysisResult?.diagnosis}`;
+    } else if (latestSev === "moderate") {
+      alertSeverity = "medium";
+      alertMessage = `Moderate risk detected: ${recentReports[0].analysisResult?.diagnosis}`;
+    }
+  }
+
+  const score = healthData?.score ?? userProfile?.healthScore ?? 0;
+  const trendData = healthData?.trend?.length > 0
+    ? healthData.trend
+    : [{ month: new Date().toLocaleString('default', { month: 'short' }), score }];
+
   return (
     <div className="space-y-8">
 
@@ -21,15 +78,31 @@ export const Dashboard = () => {
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-gradient-to-r from-amber-400 to-yellow-300 rounded-2xl p-6 flex items-start gap-4"
+        className={`rounded-2xl p-6 flex items-start gap-4 ${
+          alertSeverity === "high" ? "bg-gradient-to-r from-red-400 to-rose-300"
+          : alertSeverity === "medium" ? "bg-gradient-to-r from-amber-400 to-yellow-300"
+          : "bg-gradient-to-r from-emerald-400 to-teal-300"
+        }`}
       >
-        <AlertTriangle className="text-amber-800 w-6 h-6 mt-0.5" />
+        <AlertTriangle className={`${
+          alertSeverity === "high" ? "text-red-900"
+          : alertSeverity === "medium" ? "text-amber-900"
+          : "text-emerald-900"
+        } w-6 h-6 mt-0.5`} />
         <div>
-          <h3 className="font-semibold text-amber-900 text-sm">
-            AI Alert: Mild Cardiovascular Risk Detected
+          <h3 className={`font-semibold text-sm ${
+            alertSeverity === "high" ? "text-red-900"
+            : alertSeverity === "medium" ? "text-amber-900"
+            : "text-emerald-900"
+          }`}>
+            {alertSeverity ? "AI Alert Detected" : "Health Status: Stable"}
           </h3>
-          <p className="text-amber-800/80 text-sm mt-1">
-            Based on recent cholesterol trends, we recommend reviewing lifestyle adjustments.
+          <p className={`text-sm mt-1 ${
+            alertSeverity === "high" ? "text-red-900/80"
+            : alertSeverity === "medium" ? "text-amber-900/80"
+            : "text-emerald-900/80"
+          }`}>
+            {alertMessage}
           </p>
         </div>
       </motion.div>
@@ -47,24 +120,28 @@ export const Dashboard = () => {
             Recent Timeline
           </h3>
 
-          <div className="space-y-4">
-            {dummyTimelineEvents.slice(0, 4).map((event) => (
-              <div
-                key={event.id}
-                className="flex items-start gap-3"
-              >
-                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
-                <div>
-                  <p className="font-medium text-gray-700 text-sm">
-                    {event.title}
-                  </p>
-                  <p className="text-gray-400 text-xs">
-                    {new Date(event.date).toLocaleDateString()}
-                  </p>
+          {timeline.length === 0 ? (
+            <p className="text-sm text-gray-400">No recent events found. Upload a report or add an event to see it here.</p>
+          ) : (
+            <div className="space-y-4">
+              {timeline.slice(0, 4).map((event) => (
+                <div
+                  key={event._id}
+                  className="flex items-start gap-3"
+                >
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-700 text-sm">
+                      {event.title}
+                    </p>
+                    <p className="text-gray-400 text-xs">
+                      {new Date(event.date).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </motion.div>
 
         {/* Health Trend Graph */}
@@ -78,10 +155,10 @@ export const Dashboard = () => {
           </h3>
 
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={dummyHealthTrendData}>
+            <LineChart data={trendData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
               <XAxis dataKey="month" stroke="#9ca3af" fontSize={12} />
-              <YAxis stroke="#9ca3af" fontSize={12} />
+              <YAxis stroke="#9ca3af" fontSize={12} domain={[0, 100]} />
               <Tooltip
                 contentStyle={{
                   backgroundColor: "#fff",
@@ -92,7 +169,7 @@ export const Dashboard = () => {
               />
               <Line
                 type="monotone"
-                dataKey="healthScore"
+                dataKey="score"
                 stroke="#f59e0b"
                 strokeWidth={2.5}
                 dot={{ fill: "#f59e0b", r: 4, strokeWidth: 2, stroke: "#fff" }}
@@ -114,7 +191,7 @@ export const Dashboard = () => {
             <h4 className="text-sm font-medium text-gray-500">Health Score</h4>
           </div>
           <p className="text-2xl font-bold text-gray-800">
-            {dummyUserData.healthScore}
+            {score}
           </p>
         </div>
 
@@ -125,20 +202,24 @@ export const Dashboard = () => {
             </div>
             <h4 className="text-sm font-medium text-gray-500">Risk Level</h4>
           </div>
-          <p className="text-lg font-semibold text-emerald-600">
-            Moderate
+          <p className={`text-lg font-semibold ${
+            score > 80 ? "text-emerald-600"
+            : score > 50 ? "text-amber-600"
+            : "text-red-600"
+          }`}>
+            {score > 80 ? "Low" : score > 50 ? "Moderate" : "High"}
           </p>
         </div>
 
         <div className="card">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center">
-              <AlertTriangle className="text-red-500 w-4 h-4" />
+            <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+              <AlertTriangle className="text-blue-500 w-4 h-4" />
             </div>
-            <h4 className="text-sm font-medium text-gray-500">Active Alerts</h4>
+            <h4 className="text-sm font-medium text-gray-500">Total Reports</h4>
           </div>
-          <p className="text-lg font-semibold text-red-500">
-            1 Critical
+          <p className="text-lg font-semibold text-blue-600">
+            {recentReports.length} Document{recentReports.length !== 1 ? 's' : ''}
           </p>
         </div>
 
