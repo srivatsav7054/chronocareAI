@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Body -->
+  <ellipse cx="32" cy="36" rx="14" ry="16" fill="#fbbf24"/>
+  <!-- Stripes -->
+  <rect x="18" y="30" width="28" height="4" rx="2" fill="#1a1a1a"/>
+  <rect x="18" y="38" width="28" height="4" rx="2" fill="#1a1a1a"/>
+  <rect x="18" y="46" width="28" height="3" rx="2" fill="#1a1a1a"/>
+  <!-- Head -->
+  <circle cx="32" cy="20" r="10" fill="#fbbf24"/>
+  <!-- Eyes -->
+  <circle cx="28" cy="18" r="2.5" fill="#1a1a1a"/>
+  <circle cx="36" cy="18" r="2.5" fill="#1a1a1a"/>
+  <!-- Eye shine -->
+  <circle cx="29" cy="17" r="0.8" fill="#fff"/>
+  <circle cx="37" cy="17" r="0.8" fill="#fff"/>
+  <!-- Antennae -->
+  <line x1="28" y1="12" x2="22" y2="4" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="12" x2="42" y2="4" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="22" cy="4" r="2" fill="#fbbf24"/>
+  <circle cx="42" cy="4" r="2" fill="#fbbf24"/>
+  <!-- Wings -->
+  <ellipse cx="18" cy="28" rx="9" ry="6" fill="#fff" fill-opacity="0.7" transform="rotate(-20 18 28)"/>
+  <ellipse cx="46" cy="28" rx="9" ry="6" fill="#fff" fill-opacity="0.7" transform="rotate(20 46 28)"/>
+  <!-- Smile -->
+  <path d="M28 23 Q32 27 36 23" stroke="#1a1a1a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Stinger -->
+  <polygon points="32,52 29,56 35,56" fill="#1a1a1a"/>
+</svg>

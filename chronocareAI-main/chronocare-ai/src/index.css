@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-white text-gray-800 font-sans;
+}
+
+/* Smooth transitions globally */
+* {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Soft card style */
+.card {
+  @apply bg-white rounded-xl shadow-md border border-gray-100 p-6;
+}
+
+/* Primary honey button */
+.btn-honey {
+  @apply bg-honey-500 hover:bg-honey-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md;
+}
+
+/* Secondary outline button */
+.btn-outline {
+  @apply border border-honey-500 text-honey-600 hover:bg-honey-50 px-6 py-3 rounded-lg;
+}
+
+/* Subtle section background */
+.section-soft {
+  @apply bg-honey-50;
+}
